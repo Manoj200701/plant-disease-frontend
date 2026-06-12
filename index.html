@@ -164,12 +164,49 @@
 
         .result-row{
             margin-bottom:12px;
+            display:flex;
+            justify-content:space-between;
+            align-items:center;
         }
 
         .label{
             color:var(--accent-blue);
             font-weight:bold;
         }
+
+        /* NEW METRIC FEATURES STYLE EXTRA PACK */
+        .health-score-container {
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .bar-bg {
+            width: 100%;
+            height: 12px;
+            background: #3a506b;
+            border-radius: 6px;
+            overflow: hidden;
+            margin-top: 6px;
+        }
+
+        .bar-fill {
+            height: 100%;
+            width: 0%;
+            transition: width 0.8s ease-out, background-color 0.3s;
+            background: var(--accent-green);
+        }
+
+        .status-badge {
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: bold;
+        }
+
+        .badge-healthy { background: rgba(16, 185, 129, 0.2); color: var(--accent-green); }
+        .badge-warning { background: rgba(245, 158, 11, 0.2); color: var(--accent-amber); }
+        .badge-danger { background: rgba(239, 68, 68, 0.2); color: var(--accent-red); }
 
         .info-card{
             background:rgba(255,255,255,0.04);
@@ -208,7 +245,6 @@
 
     <div class="grid">
 
-        <!-- LEFT -->
         <div class="card">
 
             <div class="title">Upload Plant Leaf</div>
@@ -255,11 +291,20 @@
                     <span id="confidenceResult"></span>
                 </div>
 
+                <div class="health-score-container">
+                    <div class="result-row">
+                        <span class="label">Plant Vitality Index:</span>
+                        <span id="healthStatusBadge" class="status-badge">Calculating...</span>
+                    </div>
+                    <div class="bar-bg">
+                        <div id="healthScoreBar" class="bar-fill"></div>
+                    </div>
+                </div>
+
             </div>
 
         </div>
 
-        <!-- RIGHT -->
         <div class="card">
 
             <div class="title">Precautions & Treatment</div>
@@ -287,11 +332,6 @@
 </footer>
 
 <script>
-
-    // =========================================
-    // IMPORTANT:
-    // REPLACE WITH YOUR RENDER BACKEND URL
-    // =========================================
 
     const BACKEND_URL = "https://my-project-3-2ox0.onrender.com";
 
@@ -350,27 +390,19 @@
     };
 
     function previewImage(){
-
         const file = document.getElementById('imageInput').files[0];
-
         if(!file) return;
 
         const reader = new FileReader();
-
         reader.onload = function(e){
-
             document.getElementById('previewImage').src = e.target.result;
-
             document.getElementById('previewBox').style.display = "block";
         };
-
         reader.readAsDataURL(file);
     }
 
     async function analyzePlant(){
-
         const file = document.getElementById('imageInput').files[0];
-
         if(!file){
             alert("Please upload an image.");
             return;
@@ -378,14 +410,12 @@
 
         document.getElementById('loader').style.display = "block";
         document.getElementById('resultBox').style.display = "none";
+        document.getElementById('analyzeBtn').disabled = true;
 
         const formData = new FormData();
-
-        // IMPORTANT
         formData.append("plantImage", file);
 
         try{
-
             const response = await fetch(
                 `${BACKEND_URL}/api/diagnose`,
                 {
@@ -395,7 +425,6 @@
             );
 
             const data = await response.json();
-
             console.log(data);
 
             if(!response.ok){
@@ -403,60 +432,62 @@
             }
 
             const plant = data.plantName || "Unknown";
-
             const disease = data.diseaseName || "Unknown";
-
             const confidence = data.confidence || 0;
 
             document.getElementById('plantResult').innerText = plant;
-
             document.getElementById('diseaseResult').innerText = disease;
+            document.getElementById('confidenceResult').innerText = `${confidence}%`;
 
-            document.getElementById('confidenceResult').innerText =
-            `${confidence}%`;
+            // METRIC EVALUATION LOGIC
+            const scoreBar = document.getElementById('healthScoreBar');
+            const statusBadge = document.getElementById('healthStatusBadge');
+            
+            statusBadge.className = "status-badge"; 
+
+            if(disease.toLowerCase().includes("healthy")) {
+                statusBadge.innerText = "Excellent Health";
+                statusBadge.classList.add("badge-healthy");
+                scoreBar.style.width = "95%";
+                scoreBar.style.backgroundColor = "var(--accent-green)";
+            } else if(confidence < 60) {
+                statusBadge.innerText = "Moderate Risk";
+                statusBadge.classList.add("badge-warning");
+                scoreBar.style.width = "55%";
+                scoreBar.style.backgroundColor = "var(--accent-amber)";
+            } else {
+                statusBadge.innerText = "Infected / High Threat";
+                statusBadge.classList.add("badge-danger");
+                scoreBar.style.width = "25%";
+                scoreBar.style.backgroundColor = "var(--accent-red)";
+            }
 
             document.getElementById('resultBox').style.display = "block";
-
             updateDiseaseInfo(disease);
 
         }catch(error){
-
             console.error(error);
-
             alert("Failed to analyze image.");
-
         }finally{
-
             document.getElementById('loader').style.display = "none";
+            document.getElementById('analyzeBtn').disabled = false;
         }
     }
 
     function updateDiseaseInfo(disease){
-
         let matchedKey = "Healthy";
 
-        if(
-            disease.includes("Bacterial") ||
-            disease.includes("Spot")
-        ){
+        if(disease.includes("Bacterial") || disease.includes("Spot")){
             matchedKey = "Bacterial Spot";
         }
-
-        else if(
-            disease.includes("Early")
-        ){
+        else if(disease.includes("Early")){
             matchedKey = "Early Blight";
         }
-
-        else if(
-            disease.includes("Late") ||
-            disease.includes("Blight")
-        ){
+        else if(disease.includes("Late") || disease.includes("Blight")){
             matchedKey = "Late Blight";
         }
 
         const diseaseData = diseaseDatabase[matchedKey];
-
         let html = "";
 
         html += `
@@ -483,7 +514,6 @@
 
         document.getElementById('infoContainer').innerHTML = html;
     }
-
 </script>
 
 </body>
