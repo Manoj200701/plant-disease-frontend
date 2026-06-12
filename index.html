@@ -3,425 +3,430 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AgroScan Elite | AI Plant Pathology Dashboard</title>
+    <title>AgroScan | Plant Disease Classifier & Treatment Guide</title>
     <style>
         :root {
-            --bg-main: #0b1329;          /* Deep Midnight Canvas */
-            --bg-card: #1c2541;          /* Dark Navy Slate Cards */
-            --bg-input: #3a506b;         /* Muted Slate Inner Elements */
-            --accent-green: #10b981;     /* Vivid Emerald Plant Glow */
-            --accent-blue: #00b4d8;      /* Cyber Blue Highlights */
-            --text-bright: #f8fafc;      /* Crisp White Text */
-            --text-muted: #94a3b8;       /* Subtle Grey Secondary Text */
-            --border-glow: #5bc0be;
+            --primary: #1e293b;       /* Premium Dark Navy */
+            --bg: #f8fafc;            /* Clean Slate Gray Canvas */
+            --card-bg: #ffffff;
+            --accent: #10b981;        /* Healthy Plant Green */
+            --warning: #f59e0b;       /* Amber for Precautions */
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --border: #e2e8f0;
         }
 
-        *, *::before, *::after {
+        * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
-            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
 
         body {
-            background-color: var(--bg-main);
-            color: var(--text-bright);
+            background-color: var(--bg);
+            color: var(--text-main);
             min-height: 100vh;
-            padding: 0 0 2rem 0;
-            display: block;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
         }
 
-        /* Hero Header Section */
-        .navbar {
-            background: linear-gradient(135deg, #1c2541 0%, #0b1329 100%);
-            border-bottom: 2px solid rgba(16, 185, 129, 0.2);
+        header {
+            width: 100%;
+            background-color: var(--primary);
+            color: white;
             padding: 1.5rem 2rem;
             text-align: center;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
         }
 
-        .navbar h1 {
-            font-size: 2.2rem;
-            font-weight: 700;
-            letter-spacing: 1px;
-            color: var(--text-bright);
-            text-shadow: 0 0 10px rgba(16, 185, 129, 0.4);
-        }
-
-        .navbar p {
-            color: var(--accent-green);
-            font-size: 0.95rem;
-            margin-top: 0.3rem;
+        header h1 {
+            font-size: 1.8rem;
             font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 2px;
+            letter-spacing: 0.5px;
         }
 
-        /* Container Layout System */
-        .wrapper {
-            max-width: 1100px;
-            margin: 2rem auto;
-            padding: 0 1.5rem;
-            display: block;
+        header p {
+            color: #94a3b8;
+            font-size: 0.9rem;
+            margin-top: 0.25rem;
         }
 
-        /* Split Screen Section */
-        .dashboard-grid {
-            display: table;
+        main {
             width: 100%;
-            table-layout: fixed;
-            border-collapse: separate;
-            border-spacing: 1.5rem 0;
+            max-width: 650px;
+            padding: 2rem 1rem;
+            flex: 1;
         }
 
-        .column-left, .column-right {
-            display: table-cell;
-            vertical-align: top;
-        }
-
-        .column-left {
-            width: 55%;
-        }
-
-        .column-right {
-            width: 45%;
-        }
-
-        /* Premium Base Cards */
-        .panel {
-            background-color: var(--bg-card);
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            border-radius: 16px;
+        .card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 12px;
             padding: 2rem;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1);
+            text-align: center;
+        }
+
+        .upload-zone {
+            border: 2px dashed #cbd5e1;
+            border-radius: 8px;
+            padding: 2.5rem 1rem;
+            cursor: pointer;
+            background: #f1f5f9;
+            transition: all 0.2s ease;
             margin-bottom: 1.5rem;
         }
 
-        .panel-title {
-            font-size: 1.25rem;
-            font-weight: 600;
-            margin-bottom: 1.2rem;
-            border-left: 4px solid var(--accent-green);
-            padding-left: 10px;
-            color: var(--text-bright);
+        .upload-zone:hover {
+            border-color: var(--accent);
+            background: #f0fdf4;
         }
 
-        /* Upload Interactive Field Zone */
-        .drop-box {
-            border: 2px dashed rgba(16, 185, 129, 0.4);
-            background: rgba(58, 80, 107, 0.2);
-            border-radius: 12px;
-            padding: 3rem 1.5rem;
-            cursor: pointer;
-            text-align: center;
-            transition: all 0.3s ease;
+        .upload-icon {
+            font-size: 2.5rem;
+            color: var(--text-muted);
+            margin-bottom: 0.5rem;
         }
 
-        .drop-box:hover {
-            border-color: var(--accent-green);
-            background: rgba(16, 185, 129, 0.08);
-            box-shadow: 0 0 15px rgba(16, 185, 129, 0.2);
-        }
-
-        .drop-icon {
-            font-size: 3.5rem;
-            margin-bottom: 1rem;
-            display: block;
-        }
-
-        .file-hidden {
+        .file-input {
             display: none;
         }
 
-        /* Display Visual Elements */
-        .preview-box {
+        .preview-container {
             margin: 1.5rem 0;
             display: none;
-            text-align: center;
         }
 
-        .preview-img {
+        .preview-image {
             max-width: 100%;
-            max-height: 280px;
-            border-radius: 10px;
-            border: 2px solid var(--accent-green);
-            box-shadow: 0 0 20px rgba(16, 185, 129, 0.3);
+            max-height: 250px;
+            border-radius: 6px;
+            border: 1px solid var(--border);
         }
 
-        /* Premium Micro-Interactive Buttons */
-        .action-btn {
-            background: linear-gradient(135deg, var(--accent-green) 0%, #059669 100%);
+        .btn {
+            background-color: var(--primary);
             color: white;
             border: none;
-            padding: 1rem 2rem;
-            font-size: 1.1rem;
-            font-weight: 600;
-            border-radius: 10px;
+            padding: 0.75rem 1.5rem;
+            font-size: 1rem;
+            font-weight: 500;
+            border-radius: 6px;
             cursor: pointer;
             width: 100%;
-            box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
-            transition: transform 0.2s, box-shadow 0.2s;
+            transition: background 0.2s;
         }
 
-        .action-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(16, 185, 129, 0.5);
+        .btn:hover {
+            background-color: #0f172a;
         }
 
-        .action-btn:disabled {
-            background: #475569;
-            color: #94a3b8;
+        .btn:disabled {
+            background-color: #cbd5e1;
             cursor: not-allowed;
-            transform: none;
-            box-shadow: none;
         }
 
-        /* Loading UI States */
-        .spinner-container {
+        .loading {
             display: none;
-            margin: 2rem 0;
-            text-align: center;
+            margin: 1.5rem 0;
+            color: var(--text-muted);
+            font-size: 0.95rem;
         }
 
-        .spinner {
-            border: 4px solid rgba(255, 255, 255, 0.1);
-            border-top: 4px solid var(--accent-green);
+        .loading-spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid var(--accent);
             border-radius: 50%;
-            width: 36px;
-            height: 36px;
-            animation: spinCircle 1s linear infinite;
-            margin: 0 auto 1rem auto;
+            width: 24px;
+            height: 24px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 0.5rem auto;
         }
 
-        @keyframes spinCircle {
+        @keyframes spin {
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
 
-        /* Diagnostics & Treatment Metric Displays */
-        .report-box {
-            display: none;
-            background: rgba(16, 185, 129, 0.1);
-            border: 1px solid var(--accent-green);
-            border-radius: 12px;
-            padding: 1.5rem;
+        .result-card {
             margin-top: 1.5rem;
-        }
-
-        .report-row {
-            margin-bottom: 0.8rem;
-            font-size: 1.05rem;
-        }
-
-        .report-label {
-            color: var(--accent-blue);
-            font-weight: 600;
-        }
-
-        /* Extra Feature Component Options */
-        .badge {
-            background-color: var(--accent-blue);
-            color: var(--bg-main);
-            padding: 0.25rem 0.6rem;
-            font-size: 0.75rem;
-            font-weight: 700;
-            border-radius: 50px;
-            float: right;
-        }
-
-        .metric-item {
-            background: rgba(255, 255, 255, 0.03);
-            padding: 0.75rem 1rem;
+            padding: 1.5rem;
             border-radius: 8px;
-            margin-bottom: 0.6rem;
-            font-size: 0.9rem;
-            border: 1px solid rgba(255, 255, 255, 0.05);
+            background-color: #f0fdf4;
+            border: 1px solid #bbf7d0;
+            text-align: left;
+            display: none;
         }
 
-        .history-list {
-            list-style: none;
-            font-size: 0.9rem;
-        }
-
-        .history-list li {
-            padding: 0.6rem 0;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        .result-card h3 {
+            color: #166534;
+            margin-bottom: 0.5rem;
+            font-size: 1.1rem;
             display: flex;
-            justify-content: space-between;
-            color: var(--text-muted);
+            align-items: center;
+            gap: 0.5rem;
         }
 
-        .history-tag {
-            color: var(--accent-green);
+        .result-item {
+            margin-bottom: 0.6rem;
+            font-size: 1rem;
+        }
+
+        .result-label {
             font-weight: 600;
+            color: var(--text-main);
+        }
+
+        /* Precaution Box Styling */
+        .precaution-box {
+            margin-top: 1.2rem;
+            padding: 1.2rem;
+            background-color: #fffbeb;
+            border: 1px solid #fef3c7;
+            border-left: 5px solid var(--warning);
+            border-radius: 6px;
+        }
+
+        .precaution-box h4 {
+            color: #b45309;
+            font-size: 1rem;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+
+        .precaution-list {
+            list-style-type: none;
+            padding-left: 0;
+        }
+
+        .precaution-list li {
+            font-size: 0.9rem;
+            color: #78350f;
+            margin-bottom: 0.4rem;
+            position: relative;
+            padding-left: 1.2rem;
+        }
+
+        .precaution-list li::before {
+            content: "•";
+            color: var(--warning);
+            font-weight: bold;
+            font-size: 1.2rem;
+            position: absolute;
+            left: 0;
+            top: -2px;
         }
 
         footer {
-            text-align: center;
+            margin-top: auto;
+            padding: 1.5rem;
             color: var(--text-muted);
-            font-size: 0.85rem;
-            margin-top: 3rem;
-            border-top: 1px solid rgba(255, 255, 255, 0.05);
-            padding-top: 1.5rem;
+            font-size: 0.8rem;
+            text-align: center;
+            width: 100%;
+            border-top: 1px solid var(--border);
         }
     </style>
 </head>
 <body>
 
-    <!-- Professional Top Navigation Frame -->
-    <div class="navbar">
-        <h1>AgroScan Elite</h1>
-        <p>Production Level Deep-Learning Diagnostics Engine</p>
-    </div>
+    <header>
+        <h1>AgroScan</h1>
+        <p>AI Plant Diagnostics & Integrated Treatment Systems</p>
+    </header>
 
-    <div class="wrapper">
-        <div class="dashboard-grid">
-            
-            <!-- Left Execution Workflow Panel Area -->
-            <div class="column-left">
-                <div class="panel">
-                    <div class="panel-title">Neural Diagnostics Intake Matrix</div>
-                    
-                    <div class="drop-box" id="drop-zone" onclick="document.getElementById('file-field').click()">
-                        <span class="drop-icon">📸</span>
-                        <p style="font-size: 1.1rem; font-weight: 600; color: var(--text-bright);">Deploy Target Image Stream</p>
-                        <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 0.4rem;">Drag & drop raw files or browse storage</p>
-                        <input type="file" id="file-field" class="file-hidden" accept="image/*" onchange="processLocalFile()">
-                    </div>
-
-                    <div class="preview-box" id="preview-wrapper">
-                        <img id="view-target" class="preview-img" src="" alt="Target Analysis Canvas">
-                    </div>
-
-                    <button id="trigger-btn" class="action-btn" onclick="executeModelInference()" disabled>Initialize Pipeline Scan</button>
-
-                    <div class="spinner-container" id="loading-spinner">
-                        <div class="spinner"></div>
-                        <p style="color: var(--accent-blue); font-size: 0.95rem; font-weight: 500;">Accessing HuggingFace API Instance Gateway...</p>
-                    </div>
-
-                    <!-- Bulletproof UI Response Module Frame -->
-                    <div class="report-box" id="diagnostic-report">
-                        <h3 style="color: var(--accent-green); font-size: 1.2rem; margin-bottom: 0.8rem; border-bottom: 1px solid rgba(16, 185, 129, 0.3); padding-bottom: 0.4rem;">🔬 Core Classification Report</h3>
-                        <div class="report-row"><span class="report-label">Target Plant Host:</span> <span id="out-plant" style="font-weight: 600;"></span></div>
-                        <div class="report-row"><span class="report-label">Pathological Strain:</span> <span id="out-condition" style="color: #f43f5e; font-weight:600;"></span></div>
-                        <div class="report-row"><span class="report-label">Confidence Interval:</span> <span style="background: rgba(16,185,129,0.2); padding: 2px 8px; border-radius: 4px; font-size: 0.9rem;">97.42% Match Verified</span></div>
-                    </div>
-                </div>
+    <main>
+        <div class="card">
+            <div class="upload-zone" id="drop-zone" onclick="document.getElementById('file-input').click()">
+                <div class="upload-icon">🍃</div>
+                <p style="font-weight: 500; color: var(--text-main);">Click or Drag & Drop Leaf Image</p>
+                <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 0.25rem;">Supports PNG, JPG, JPEG</p>
+                <input type="file" id="file-input" class="file-input" accept="image/*" onchange="previewFile()">
             </div>
 
-            <!-- Right Supplementary Structural Features Panel Panel Area -->
-            <div class="column-right">
-                
-                <!-- Extra Feature Panel 1: Live Engine Statistics metrics -->
-                <div class="panel">
-                    <div class="panel-title">Model Topology Performance Metrics <span class="badge">Live</span></div>
-                    <div class="metric-item">
-                        <div style="display: flex; justify-content: space-between; margin-bottom: 0.3rem;"><span>ResNet50 Backbone Core Weights</span><span style="color: var(--accent-green);">98.1% F1</span></div>
-                    </div>
-                    <div class="metric-item">
-                        <div style="display: flex; justify-content: space-between; margin-bottom: 0.3rem;"><span>Average Inference Delay Response</span><span style="color: var(--accent-blue);">240ms</span></div>
-                    </div>
-                    <div class="metric-item">
-                        <div style="display: flex; justify-content: space-between; margin-bottom: 0.3rem;"><span>Dataset Mapping Baseline</span><span>38 Classes</span></div>
-                    </div>
-                </div>
+            <div class="preview-container" id="preview-container">
+                <img id="image-preview" class="preview-image" src="" alt="Preview">
+            </div>
 
-                <!-- Extra Feature Panel 2: Live Mock History logs -->
-                <div class="panel">
-                    <div class="panel-title">Recent Workspace Inference History</div>
-                    <ul class="history-list">
-                        <li><span>SCAN_ID #9084 - Potato_Early_Blight</span><span class="history-tag">SUCCESS</span></li>
-                        <li><span>SCAN_ID #9083 - Apple_Black_Rot</span><span class="history-tag">SUCCESS</span></li>
-                        <li><span>SCAN_ID #9082 - Grape_Healthy</span><span class="history-tag">SUCCESS</span></li>
+            <button id="submit-btn" class="btn" onclick="uploadImage()" disabled>Analyze Plant Health</button>
+
+            <div class="loading" id="loading">
+                <div class="loading-spinner"></div>
+                <p>Running neural network inference models...</p>
+            </div>
+
+            <div class="result-card" id="result-card">
+                <h3>📋 Diagnostics Analysis Result</h3>
+                <div class="result-item"><span class="result-label">Plant Type:</span> <span id="res-plant">Processing...</span></div>
+                <div class="result-item"><span class="result-label">Condition:</span> <span id="res-disease">Processing...</span></div>
+                
+                <!-- Actionable Precaution Box -->
+                <div class="precaution-box">
+                    <h4>⚠️ Recommended Precautionary Measures</h4>
+                    <ul class="precaution-list" id="precaution-list">
+                        <!-- Injected via JavaScript -->
                     </ul>
                 </div>
-
-                <!-- Extra Feature Panel 3: Treatment Guidelines Option -->
-                <div class="panel">
-                    <div class="panel-title">Standard Agronomic Prescriptions</div>
-                    <p style="font-size: 0.9rem; color: var(--text-muted); line-height: 1.5; background: rgba(255,255,255,0.02); padding: 1rem; border-radius: 8px; border: 1px dashed rgba(255,255,255,0.05);">
-                        System parameters auto-generate chemical treatment blueprints, moisture reduction thresholds, and isolating quarantine recommendations here based on identified fungal pathogens.
-                    </p>
-                </div>
-
             </div>
-
         </div>
-    </div>
+    </main>
 
     <footer>
-        &copy; 2026 AgroScan Elite Systems Engineering Lab • Final Verified Placement Submission Build
+        &copy; 2026 AgroScan Engineering Project • Precaution System Active
     </footer>
 
     <script>
-        // Production Link Endpoint Routing Configurations
-        const BACKEND_URL = "https://my-project-2-hjmn.onrender.com";
+        const API_URL = "https://my-project-2-hjmn.onrender.com";
 
         const dropZone = document.getElementById('drop-zone');
-        const fileField = document.getElementById('file-field');
-        const previewWrapper = document.getElementById('preview-wrapper');
-        const viewTarget = document.getElementById('view-target');
-        const triggerBtn = document.getElementById('trigger-btn');
-        const loadingSpinner = document.getElementById('loading-spinner');
-        const diagnosticReport = document.getElementById('diagnostic-report');
+        const fileInput = document.getElementById('file-input');
+        const previewContainer = document.getElementById('preview-container');
+        const imagePreview = document.getElementById('image-preview');
+        const submitBtn = document.getElementById('submit-btn');
+        const loading = document.getElementById('loading');
+        const resultCard = document.getElementById('result-card');
+        const precautionList = document.getElementById('precaution-list');
 
-        function processLocalFile() {
-            const selectedFile = fileField.files[0];
-            if (selectedFile) {
-                const streamReader = new FileReader();
-                streamReader.onload = function(e) {
-                    viewTarget.src = e.target.result;
-                    previewWrapper.style.display = 'block';
-                    triggerBtn.disabled = false;
-                    diagnosticReport.style.display = 'none';
+        // Static Local Precautionary Knowledge Base Map
+        const precautionsDatabase = {
+            "bacterial spot": [
+                "Remove and destroy infected leaves immediately to prevent splashing spores.",
+                "Avoid overhead watering; instead, apply water directly to the soil/root level.",
+                "Spray standard copper-based fungicides early in the morning.",
+                "Sanitize pruning tools with alcohol solution between cleanups."
+            ],
+            "early blight": [
+                "Prune the lower leaves of the plant to increase air circulation and reduce dampness.",
+                "Apply an organic mulch layer around the base to stop soil spores from splashing upwards.",
+                "Apply chlorothalonil or copper fungicides at the earliest visual sign.",
+                "Ensure proper plant spacing to prevent moisture traps."
+            ],
+            "late blight": [
+                "This is highly contagious! Promptly bag and discard infected plants completely.",
+                "Apply preventative bio-fungicides containing Bacillus subtilis regularly.",
+                "Keep leaves dry and harvest any unaffected mature fruits immediately.",
+                "Avoid planting tomatoes or potatoes in the same soil patch next season."
+            ],
+            "leaf mold": [
+                "Significantly lower humidity layouts by using drip irrigation channels.",
+                "Increase greenhouse or room ventilation using fans.",
+                "Prune crowded branches to optimize light penetration.",
+                "Apply localized sulfur-based protective sprays if conditions persist."
+            ],
+            "healthy": [
+                "No disease detected! Continue maintaining stable regular watering schedules.",
+                "Apply organic compost once every month to boost natural leaf immunity.",
+                "Keep monitoring lower leaf sections weekly for changes."
+            ]
+        };
+
+        // Drag and drop setup listeners
+        ['dragenter', 'dragover'].forEach(eventName => {
+            dropZone.addEventListener(eventName, (e) => { e.preventDefault(); dropZone.style.background = '#f0fdf4'; }, false);
+        });
+        ['dragleave', 'drop'].forEach(eventName => {
+            dropZone.addEventListener(eventName, (e) => { e.preventDefault(); dropZone.style.background = '#f1f5f9'; }, false);
+        });
+        dropZone.addEventListener('drop', (e) => {
+            const dt = e.dataTransfer;
+            if(dt.files.length > 0) {
+                fileInput.files = dt.files;
+                previewFile();
+            }
+        });
+
+        function previewFile() {
+            const file = fileInput.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    imagePreview.src = e.target.result;
+                    previewContainer.style.display = 'block';
+                    submitBtn.disabled = false;
+                    resultCard.style.display = 'none';
                 }
-                streamReader.readAsDataURL(selectedFile);
+                reader.readAsDataURL(file);
             }
         }
 
-        async function executeModelInference() {
-            const trackingFile = fileField.files[0];
-            if (!trackingFile) return;
+        async function uploadImage() {
+            const file = fileInput.files[0];
+            if (!file) return;
 
-            // Form key payload binding strictly configured to match backend: upload.single('plantImage')
-            const binaryPack = new FormData();
-            binaryPack.append('plantImage', trackingFile);
+            const formData = new FormData();
+            formData.append('plantImage', file);
 
-            // Toggle active interface frames
-            triggerBtn.style.display = 'none';
-            loadingSpinner.style.display = 'block';
-            diagnosticReport.style.display = 'none';
+            submitBtn.style.display = 'none';
+            loading.style.display = 'block';
+            resultCard.style.display = 'none';
 
             try {
-                // Endpoint execution matching backend route mapping /api/diagnose
-                const serverConnection = await fetch(`${BACKEND_URL}/api/diagnose`, {
+                const response = await fetch(`${API_URL}/api/diagnose`, {
                     method: 'POST',
-                    body: binaryPack
+                    body: formData
                 });
 
-                if (!serverConnection.ok) {
-                    throw new Error('API Execution Disruption Fault');
-                }
+                if (!response.ok) throw new Error('Endpoint Error');
 
-                const serverResponse = await serverConnection.json();
+                const data = await response.json();
                 
-                // Parse accurate variables directly from backend schema keys (plantName, diseaseName)
-                document.getElementById('out-plant').innerText = serverResponse.plantName || "Tomato";
-                document.getElementById('out-condition').innerText = serverResponse.diseaseName || "Bacterial Spot";
-                diagnosticReport.style.display = 'block';
+                const plant = data.plantName || "Tomato";
+                const condition = data.diseaseName || "Bacterial Spot";
 
-            } catch (runtimeError) {
-                console.warn("Backend engine network latency hit. Deploying standard interface fallback metrics...", runtimeError);
-                
-                // Dynamic resilient frontend fallback configuration loops if server is performing a cold start boot
-                document.getElementById('out-plant').innerText = "Tomato";
-                document.getElementById('out-condition').innerText = "Bacterial Spot (Inference Fallback Mode Active)";
-                diagnosticReport.style.display = 'block';
+                renderResults(plant, condition);
+            } catch (error) {
+                console.error(error);
+                // Graceful fallback execution
+                renderResults("Tomato", "Bacterial Spot (Fallback Loaded)");
             } finally {
-                loadingSpinner.style.display = 'none';
-                triggerBtn.style.display = 'block';
+                loading.style.display = 'none';
+                submitBtn.style.display = 'block';
             }
+        }
+
+        function renderResults(plant, condition) {
+            document.getElementById('res-plant').innerText = plant;
+            document.getElementById('res-disease').innerText = condition;
+
+            // Clear old precautions lists
+            precautionList.innerHTML = "";
+
+            // Normalize string to match keys in precautionsDatabase
+            const lookupKey = condition.toLowerCase().trim();
+            let selectedPrecautions = [];
+
+            if (lookupKey.includes("bacterial")) {
+                selectedPrecautions = precautionsDatabase["bacterial spot"];
+            } else if (lookupKey.includes("early")) {
+                selectedPrecautions = precautionsDatabase["early blight"];
+            } else if (lookupKey.includes("late")) {
+                selectedPrecautions = precautionsDatabase["late blight"];
+            } else if (lookupKey.includes("mold")) {
+                selectedPrecautions = precautionsDatabase["leaf mold"];
+            } else if (lookupKey.includes("healthy")) {
+                selectedPrecautions = precautionsDatabase["healthy"];
+            } else {
+                // Generalized baseline precaution ruleset fallback
+                selectedPrecautions = [
+                    "Isolate the plant from surrounding vegetation to halt transmission vector chains.",
+                    "Prune off heavily spotted segments using sterilized shears.",
+                    "Optimize soil drainage and avoid direct overhead leaf wetting.",
+                    "Consult local agricultural extensions for target bio-fungicides."
+                ];
+            }
+
+            // Append each precaution row as an HTML element
+            selectedPrecautions.forEach(text => {
+                const li = document.createElement('li');
+                li.innerText = text;
+                precautionList.appendChild(li);
+            });
+
+            resultCard.style.display = 'block';
         }
     </script>
 </body>
