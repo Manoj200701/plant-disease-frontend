@@ -1,548 +1,490 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AgroScan Premium | AI Plant Pathology Dashboard</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>AgroScan AI | Plant Disease Detector</title>
+
     <style>
-        :root {
-            --bg-main: #0b1329;          /* Deep Midnight Canvas */
-            --bg-card: #1c2541;          /* Dark Navy Slate Cards */
-            --bg-input: #3a506b;         /* Muted Slate Inner Elements */
-            --accent-green: #10b981;     /* Vivid Emerald Plant Glow */
-            --accent-blue: #00b4d8;      /* Cyber Blue Highlights */
-            --text-bright: #f8fafc;      /* Crisp White Text */
-            --text-muted: #94a3b8;       /* Subtle Grey Secondary Text */
-            --border-glow: #5bc0be;
-            --accent-amber: #f59e0b;     /* Warning/Precaution Amber Accent */
-            --accent-red: #ef4444;       /* Pesticide/Target Red Accent */
+        :root{
+            --bg-main:#0b1329;
+            --bg-card:#1c2541;
+            --bg-input:#3a506b;
+            --accent-green:#10b981;
+            --accent-blue:#00b4d8;
+            --text-bright:#f8fafc;
+            --text-muted:#94a3b8;
+            --accent-amber:#f59e0b;
+            --accent-red:#ef4444;
         }
 
-        *, *::before, *::after {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+        *{
+            margin:0;
+            padding:0;
+            box-sizing:border-box;
+            font-family:'Segoe UI',sans-serif;
         }
 
-        body {
-            background-color: var(--bg-main);
-            color: var(--text-bright);
-            min-height: 100vh;
-            padding: 0 0 2rem 0;
-            display: block;
+        body{
+            background:var(--bg-main);
+            color:var(--text-bright);
+            min-height:100vh;
         }
 
-        /* Hero Header Section */
-        .navbar {
-            background: linear-gradient(135deg, #1c2541 0%, #0b1329 100%);
-            border-bottom: 2px solid rgba(16, 185, 129, 0.2);
-            padding: 1.5rem 2rem;
-            text-align: center;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+        .navbar{
+            padding:1.5rem;
+            text-align:center;
+            border-bottom:1px solid rgba(255,255,255,0.08);
+            background:linear-gradient(135deg,#1c2541,#0b1329);
         }
 
-        .navbar h1 {
-            font-size: 2.2rem;
-            font-weight: 700;
-            letter-spacing: 1px;
-            color: var(--text-bright);
-            text-shadow: 0 0 10px rgba(16, 185, 129, 0.4);
+        .navbar h1{
+            font-size:2rem;
+            color:white;
         }
 
-        .navbar p {
-            color: var(--accent-green);
-            font-size: 0.95rem;
-            margin-top: 0.3rem;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 2px;
+        .navbar p{
+            margin-top:8px;
+            color:var(--accent-green);
         }
 
-        /* Container Layout System */
-        .wrapper {
-            max-width: 1200px;
-            margin: 2rem auto;
-            padding: 0 1.5rem;
-            display: block;
+        .wrapper{
+            max-width:1200px;
+            margin:auto;
+            padding:2rem;
         }
 
-        /* Split Screen Section */
-        .dashboard-grid {
-            display: table;
-            width: 100%;
-            table-layout: fixed;
-            border-collapse: separate;
-            border-spacing: 1.5rem 0;
+        .grid{
+            display:grid;
+            grid-template-columns:1fr 1fr;
+            gap:1.5rem;
         }
 
-        .column-left, .column-right {
-            display: table-cell;
-            vertical-align: top;
+        .card{
+            background:var(--bg-card);
+            padding:1.5rem;
+            border-radius:16px;
+            box-shadow:0 10px 30px rgba(0,0,0,0.3);
         }
 
-        .column-left {
-            width: 50%;
+        .title{
+            margin-bottom:1rem;
+            border-left:4px solid var(--accent-green);
+            padding-left:10px;
+            font-size:1.1rem;
         }
 
-        .column-right {
-            width: 50%;
+        .upload-box{
+            border:2px dashed rgba(16,185,129,0.5);
+            padding:2rem;
+            border-radius:14px;
+            text-align:center;
+            cursor:pointer;
+            transition:0.3s;
         }
 
-        /* Premium Base Cards */
-        .panel {
-            background-color: var(--bg-card);
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            border-radius: 16px;
-            padding: 2rem;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-            margin-bottom: 1.5rem;
+        .upload-box:hover{
+            background:rgba(16,185,129,0.08);
         }
 
-        .panel-title {
-            font-size: 1.25rem;
-            font-weight: 600;
-            margin-bottom: 1.2rem;
-            border-left: 4px solid var(--accent-green);
-            padding-left: 10px;
-            color: var(--text-bright);
+        .upload-box p{
+            margin-top:10px;
+            color:var(--text-muted);
         }
 
-        /* Upload Interactive Field Zone */
-        .drop-box {
-            border: 2px dashed rgba(16, 185, 129, 0.4);
-            background: rgba(58, 80, 107, 0.2);
-            border-radius: 12px;
-            padding: 3rem 1.5rem;
-            cursor: pointer;
-            text-align: center;
-            transition: all 0.3s ease;
+        input[type="file"]{
+            display:none;
         }
 
-        .drop-box:hover {
-            border-color: var(--accent-green);
-            background: rgba(16, 185, 129, 0.08);
-            box-shadow: 0 0 15px rgba(16, 185, 129, 0.2);
+        .preview{
+            margin-top:1.5rem;
+            display:none;
         }
 
-        .drop-icon {
-            font-size: 3.5rem;
-            margin-bottom: 1rem;
-            display: block;
+        .preview img{
+            width:100%;
+            max-height:320px;
+            object-fit:cover;
+            border-radius:12px;
+            border:2px solid var(--accent-green);
         }
 
-        .file-hidden {
-            display: none;
+        button{
+            margin-top:1.5rem;
+            width:100%;
+            border:none;
+            padding:1rem;
+            border-radius:12px;
+            background:linear-gradient(135deg,#10b981,#059669);
+            color:white;
+            font-size:1rem;
+            font-weight:600;
+            cursor:pointer;
         }
 
-        /* Display Visual Elements */
-        .preview-box {
-            margin: 1.5rem 0;
-            display: none;
-            text-align: center;
+        button:hover{
+            opacity:0.95;
         }
 
-        .preview-img {
-            max-width: 100%;
-            max-height: 280px;
-            border-radius: 10px;
-            border: 2px solid var(--accent-green);
-            box-shadow: 0 0 20px rgba(16, 185, 129, 0.3);
+        button:disabled{
+            opacity:0.5;
+            cursor:not-allowed;
         }
 
-        /* Premium Micro-Interactive Buttons */
-        .action-btn {
-            background: linear-gradient(135deg, var(--accent-green) 0%, #059669 100%);
-            color: white;
-            border: none;
-            padding: 1rem 2rem;
-            font-size: 1.1rem;
-            font-weight: 600;
-            border-radius: 10px;
-            cursor: pointer;
-            width: 100%;
-            box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
-            transition: transform 0.2s, box-shadow 0.2s;
+        .loader{
+            display:none;
+            text-align:center;
+            margin-top:1.5rem;
         }
 
-        .action-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(16, 185, 129, 0.5);
+        .spinner{
+            width:40px;
+            height:40px;
+            border:4px solid rgba(255,255,255,0.1);
+            border-top:4px solid var(--accent-green);
+            border-radius:50%;
+            animation:spin 1s linear infinite;
+            margin:auto;
         }
 
-        .action-btn:disabled {
-            background: #475569;
-            color: #94a3b8;
-            cursor: not-allowed;
-            transform: none;
-            box-shadow: none;
+        @keyframes spin{
+            100%{
+                transform:rotate(360deg);
+            }
         }
 
-        /* Loading UI States */
-        .spinner-container {
-            display: none;
-            margin: 2rem 0;
-            text-align: center;
+        .result-box{
+            display:none;
+            margin-top:1.5rem;
+            padding:1rem;
+            border-radius:12px;
+            background:rgba(16,185,129,0.08);
+            border:1px solid var(--accent-green);
         }
 
-        .spinner {
-            border: 4px solid rgba(255, 255, 255, 0.1);
-            border-top: 4px solid var(--accent-green);
-            border-radius: 50%;
-            width: 36px;
-            height: 36px;
-            animation: spinCircle 1s linear infinite;
-            margin: 0 auto 1rem auto;
+        .result-row{
+            margin-bottom:12px;
         }
 
-        @keyframes spinCircle {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+        .label{
+            color:var(--accent-blue);
+            font-weight:bold;
         }
 
-        /* Diagnostics & Treatment Metric Displays */
-        .report-box {
-            display: none;
-            background: rgba(16, 185, 129, 0.1);
-            border: 1px solid var(--accent-green);
-            border-radius: 12px;
-            padding: 1.5rem;
-            margin-top: 1.5rem;
+        .info-card{
+            background:rgba(255,255,255,0.04);
+            border-radius:10px;
+            padding:1rem;
+            margin-bottom:1rem;
         }
 
-        .report-row {
-            margin-bottom: 0.8rem;
-            font-size: 1.05rem;
+        .info-card h4{
+            margin-bottom:8px;
         }
 
-        .report-label {
-            color: var(--accent-blue);
-            font-weight: 600;
+        footer{
+            margin-top:3rem;
+            text-align:center;
+            padding:1rem;
+            color:var(--text-muted);
         }
 
-        /* Precautions Layout Styling */
-        .precaution-card {
-            background: rgba(245, 158, 11, 0.08);
-            border: 1px solid rgba(245, 158, 11, 0.3);
-            padding: 1rem;
-            border-radius: 10px;
-            margin-bottom: 0.75rem;
-        }
-
-        .precaution-card h4 {
-            color: var(--accent-amber);
-            font-size: 0.95rem;
-            font-weight: 600;
-            margin-bottom: 0.35rem;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .precaution-card p {
-            font-size: 0.88rem;
-            color: var(--text-bright);
-            line-height: 1.45;
-        }
-
-        /* Pesticides Layout Styling */
-        .pesticide-card {
-            background: rgba(239, 68, 68, 0.08);
-            border: 1px solid rgba(239, 68, 68, 0.3);
-            padding: 1rem;
-            border-radius: 10px;
-            margin-bottom: 0.75rem;
-        }
-
-        .pesticide-card h4 {
-            color: var(--accent-red);
-            font-size: 0.95rem;
-            font-weight: 600;
-            margin-bottom: 0.35rem;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .pesticide-card p {
-            font-size: 0.88rem;
-            color: var(--text-bright);
-            line-height: 1.45;
-        }
-
-        .history-list {
-            list-style: none;
-            font-size: 0.9rem;
-        }
-
-        .history-list li {
-            padding: 0.6rem 0;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-            display: flex;
-            justify-content: space-between;
-            color: var(--text-muted);
-        }
-
-        .history-tag {
-            color: var(--accent-green);
-            font-weight: 600;
-        }
-
-        footer {
-            text-align: center;
-            color: var(--text-muted);
-            font-size: 0.85rem;
-            margin-top: 3rem;
-            border-top: 1px solid rgba(255, 255, 255, 0.05);
-            padding-top: 1.5rem;
+        @media(max-width:900px){
+            .grid{
+                grid-template-columns:1fr;
+            }
         }
     </style>
 </head>
+
 <body>
 
-    <!-- Professional Top Navigation Frame -->
-    <div class="navbar">
-        <h1>AgroScan Premium</h1>
-        <p>Advanced Real-Time Crop Pathology & Remediation Suite</p>
-    </div>
+<div class="navbar">
+    <h1>AgroScan AI</h1>
+    <p>Real-Time Plant Disease Detection System</p>
+</div>
 
-    <div class="wrapper">
-        <div class="dashboard-grid">
-            
-            <!-- Left Execution Workflow Panel Area -->
-            <div class="column-left">
-                <div class="panel">
-                    <div class="panel-title">Neural Diagnostics Intake Matrix</div>
-                    
-                    <div class="drop-box" id="drop-zone" onclick="document.getElementById('file-field').click()">
-                        <span class="drop-icon">📸</span>
-                        <p style="font-size: 1.1rem; font-weight: 600; color: var(--text-bright);">Deploy Target Image Stream</p>
-                        <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 0.4rem;">Drag & drop raw files or browse storage</p>
-                        <input type="file" id="file-field" class="file-hidden" accept="image/*" onchange="processLocalFile()">
-                    </div>
+<div class="wrapper">
 
-                    <div class="preview-box" id="preview-wrapper">
-                        <img id="view-target" class="preview-img" src="" alt="Target Analysis Canvas">
-                    </div>
+    <div class="grid">
 
-                    <button id="trigger-btn" class="action-btn" onclick="executeModelInference()">Initialize Pipeline Scan</button>
+        <!-- LEFT -->
+        <div class="card">
 
-                    <div class="spinner-container" id="loading-spinner">
-                        <div class="spinner"></div>
-                        <p style="color: var(--accent-blue); font-size: 0.95rem; font-weight: 500;">Accessing HuggingFace API Instance Gateway...</p>
-                    </div>
+            <div class="title">Upload Plant Leaf</div>
 
-                    <!-- UI Response Module Frame -->
-                    <div class="report-box" id="diagnostic-report">
-                        <h3 style="color: var(--accent-green); font-size: 1.2rem; margin-bottom: 0.8rem; border-bottom: 1px solid rgba(16, 185, 129, 0.3); padding-bottom: 0.4rem;">🔬 Core Classification Report</h3>
-                        <div class="report-row"><span class="report-label">Target Plant Host:</span> <span id="out-plant" style="font-weight: 600;"></span></div>
-                        <div class="report-row"><span class="report-label">Pathological Strain:</span> <span id="out-condition" style="color: #f43f5e; font-weight:600;"></span></div>
-                        <div class="report-row"><span class="report-label">Confidence Interval:</span> <span style="background: rgba(16,185,129,0.2); padding: 2px 8px; border-radius: 4px; font-size: 0.9rem;">97.42% Match Verified</span></div>
-                    </div>
-                </div>
+            <div class="upload-box" onclick="document.getElementById('imageInput').click()">
+                <h2>📸 Upload Leaf Image</h2>
+                <p>Select clear plant leaf image for disease analysis</p>
 
-                <!-- Live Mock History logs -->
-                <div class="panel">
-                    <div class="panel-title">Recent Workspace Inference History</div>
-                    <ul class="history-list">
-                        <li><span>SCAN_ID #9084 - Potato_Early_Blight</span><span class="history-tag">SUCCESS</span></li>
-                        <li><span>SCAN_ID #9083 - Apple_Black_Rot</span><span class="history-tag">SUCCESS</span></li>
-                        <li><span>SCAN_ID #9082 - Grape_Healthy</span><span class="history-tag">SUCCESS</span></li>
-                    </ul>
-                </div>
+                <input type="file"
+                id="imageInput"
+                accept="image/*"
+                onchange="previewImage()">
             </div>
 
-            <!-- Right Supplementary Structural Features Panel Area -->
-            <div class="column-right">
-                
-                <!-- Live Crop Protection Precautions Matrix -->
-                <div class="panel">
-                    <div class="panel-title" style="border-left-color: var(--accent-amber);">Immediate Agricultural Precautions</div>
-                    <div id="precautions-container">
-                        <div class="precaution-card">
-                            <h4>⚠️ General Quarantine Measure</h4>
-                            <p>Isolate symptomatic crops from healthy growth fields immediately to interrupt aerial spore trajectories and water-borne vector dispersion.</p>
-                        </div>
-                        <div class="precaution-card">
-                            <h4>💧 Moisture Management Check</h4>
-                            <p>Transition to drip irrigation systems or adjust watering schedules exclusively to early dawn hours. Avoid overhead misting to keep leaf surfaces dry.</p>
-                        </div>
-                        <div class="precaution-card">
-                            <h4>✂️ Tool Sanitation Protocol</h4>
-                            <p>Sterilize all pruning tools with a 70% isopropyl alcohol solution between every single crop cutting session to stop cross-contamination.</p>
-                        </div>
-                    </div>
+            <div class="preview" id="previewBox">
+                <img id="previewImage">
+            </div>
+
+            <button id="analyzeBtn" onclick="analyzePlant()">
+                Analyze Disease
+            </button>
+
+            <div class="loader" id="loader">
+                <div class="spinner"></div>
+                <p style="margin-top:12px;">
+                    AI model analyzing image...
+                </p>
+            </div>
+
+            <div class="result-box" id="resultBox">
+
+                <div class="result-row">
+                    <span class="label">Plant:</span>
+                    <span id="plantResult"></span>
                 </div>
 
-                <!-- NEW OPTION PANEL: Recommended Pesticides / Controls Management -->
-                <div class="panel">
-                    <div class="panel-title" style="border-left-color: var(--accent-red);">Targeted Treatment & Pesticide Control</div>
-                    <div id="pesticides-container">
-                        <div class="pesticide-card">
-                            <h4>🧪 Preventative Baseline Control</h4>
-                            <p>Upload a leaf scan to analyze potential infection pathways and unlock target-specific organic treatments or localized chemical counter-measures.</p>
-                        </div>
-                    </div>
+                <div class="result-row">
+                    <span class="label">Disease:</span>
+                    <span id="diseaseResult"></span>
+                </div>
+
+                <div class="result-row">
+                    <span class="label">Confidence:</span>
+                    <span id="confidenceResult"></span>
                 </div>
 
             </div>
 
         </div>
+
+        <!-- RIGHT -->
+        <div class="card">
+
+            <div class="title">Precautions & Treatment</div>
+
+            <div id="infoContainer">
+
+                <div class="info-card">
+                    <h4>🌱 Upload Image</h4>
+                    <p>
+                        Upload a plant leaf image to receive disease detection,
+                        precautions and treatment suggestions.
+                    </p>
+                </div>
+
+            </div>
+
+        </div>
+
     </div>
 
-    <footer>
-        &copy; 2026 AgroScan Premium Engineering Lab • Final Placement Submission Build
-    </footer>
+</div>
 
-    <script>
-        // Production Link Endpoint Routing Configurations
-        const BACKEND_URL = "https://my-project-2-hjmn.onrender.com";
+<footer>
+    AgroScan AI © 2026
+</footer>
 
-        const dropZone = document.getElementById('drop-zone');
-        const fileField = document.getElementById('file-field');
-        const previewWrapper = document.getElementById('preview-wrapper');
-        const viewTarget = document.getElementById('view-target');
-        const triggerBtn = document.getElementById('trigger-btn');
-        const loadingSpinner = document.getElementById('loading-spinner');
-        const diagnosticReport = document.getElementById('diagnostic-report');
-        const precautionsContainer = document.getElementById('precautions-container');
-        const pesticidesContainer = document.getElementById('pesticides-container');
+<script>
 
-        // Extended Premium Knowledgebase Map for Precautions and Targeted Pesticides
-        const healthDatabaseDetails = {
-            "Bacterial Spot": {
-                precautions: [
-                    "<h4>🚫 Apply Copper-Based Compounds</h4><p>Apply copper fungicide/bactericide combinations early in the vegetative cycle at the first sign of dark water-soaked spots.</p>",
-                    "<h4>☀️ Optimize Canopy Airflow</h4><p>Prune lower dense foliage rows immediately to maximize aeration channels and quicken dew evaporation times.</p>",
-                    "<h4>🌱 Eliminate Surface Crop Debris</h4><p>Rake, bag, and completely bury or destroy fallen leaves to clear out bacterial strains overwintering in the soil matrix.</p>"
-                ],
-                pesticides: [
-                    "<h4>🧴 Copper Hydroxide (e.g., Kocide 3000)</h4><p>Apply at a rate of 0.5 to 1.5 lbs per acre. Acts as a highly effective protectant bactericide sheet on leaf surfaces.</p>",
-                    "<h4>🧫 Streptomycin Sulfate (Agrimycin)</h4><p>An agricultural antibiotic option used under strict outbreak conditions. Mix 100-200 ppm and apply during low-sunlight hours.</p>",
-                    "<h4>🌿 Bacillus subtilis (Serenade ASO)</h4><p>An exceptional organic bio-bactericide option. Triggers the plant's systemic defense mechanism and inhibits bacterial growth.</p>"
-                ]
-            },
-            "Early Blight": {
-                precautions: [
-                    "<h4>🍂 Prompt Lower Leaf Pruning</h4><p>Clip out lower yellowing leaves displaying dark ring concentric target patterns to halt upward fungal spore splashing.</p>",
-                    "<h4>🌾 Organic Ground Mulching</h4><p>Spread a clean 2-inch organic straw or plastic barrier layer over open rows to prevent rain droplets from splashing spores from soil onto leaves.</p>",
-                    "<h4>🔄 Adjust Field Irrigation Timings</h4><p>Switch entirely to micro-drip networks or water exclusively at dawn to keep canopy foliage dampness windows under 2 hours.</p>"
-                ],
-                pesticides: [
-                    "<h4>🧴 Chlorothalonil (e.g., Daconil WeatherStik)</h4><p>A broad-spectrum protectant fungicide. Apply 1.5 to 2 pints per acre at 7-11 day intervals upon early detection.</p>",
-                    "<h4>🧪 Azoxystrobin (Quadris Top)</h4><p>A highly effective systemic Group 11 fungicide that stops spore germination and penetrates deep into underlying plant tissues.</p>",
-                    "<h4>🍁 Mancozeb (Dithane M45)</h4><p>A multi-site protectant contact coordination compound. Prevents fungal respiration cells from mutating or developing chemical resistance.</p>"
-                ]
-            },
-            "Late Blight": {
-                precautions: [
-                    "<h4>🚨 Complete Eradication Strategy</h4><p>Uproot the entire plant system immediately if large water-soaked olive-green lesions expand rapidly. Destroy specimens immediately; do not compost.</p>",
-                    "<h4>🛡️ Local Community Outbreak Warnings</h4><p>Alert surrounding localized farms instantly since wind gusts can carry volatile late-blight spores over several miles.</p>",
-                    "<h4>🍂 Humidity Matrix Controls</h4><p>Enforce wide crop layout parameters to maximize wind speeds through internal stems and accelerate moisture dissipation.</p>"
-                ],
-                pesticides: [
-                    "<h4>🧴 Mefenoxam (Ridomil Gold SL)</h4><p>A premium systemic fungicide specifically tailored to target oomycete pathogens. Absorbed through leaves and roots for absolute defense.</p>",
-                    "<h4>🧪 Cyazofamid (Ranman 400SC)</h4><p>Inhibits the respiratory chain of the fungus. Outstanding protective management against late blight with excellent rain-fastness properties.</p>",
-                    "<h4>🌿 Propamocarb Hydrochloride (Previcur Energy)</h4><p>Dual-action systemic compound that stimulates growth roots while completely arresting fungal cell membrane synthesis.</p>"
-                ]
-            },
-            "Healthy": {
-                precautions: [
-                    "<h4>✅ Scheduled Foliar Monitoring</h4><p>Perform multi-point leaf vein inspections twice weekly to track and address microscopic structural indices before outbreaks manifest.</p>",
-                    "<h4>💪 Balanced Compost Feeding</h4><p>Maintain precise organic compost balances to reinforce the crop's natural systemic acquired resistance (SAR).</p>",
-                    "<h4>🔄 Multi-Year Structural Crop Rotation</h4><p>Rotate crop layouts every season to avoid planting solanaceous species in identical plot coordinates consecutively.</p>"
-                ],
-                pesticides: [
-                    "<h4>🌿 Neem Oil Extract (Cold-Pressed)</h4><p>Apply a preventative bi-weekly 0.5%-1.0% dilution misting. Acts as a natural deterrent against soft-bodied insect vectors and mild fungi.</p>",
-                    "<h4>🧫 Potassium Bicarbonate (MilStop)</h4><p>An eco-friendly preventative contact foliar controller. Cures and alters surface pH levels to make them completely uninhabitable for spores.</p>"
-                ]
-            }
+    // =========================================
+    // IMPORTANT:
+    // REPLACE WITH YOUR RENDER BACKEND URL
+    // =========================================
+
+    const BACKEND_URL = "https://YOUR-BACKEND.onrender.com";
+
+    const diseaseDatabase = {
+
+        "Bacterial Spot": {
+            precautions: [
+                "Remove infected leaves immediately.",
+                "Avoid overhead watering.",
+                "Maintain proper plant spacing."
+            ],
+            treatments: [
+                "Apply copper fungicide.",
+                "Use disease-free seeds.",
+                "Apply bactericide spray."
+            ]
+        },
+
+        "Early Blight": {
+            precautions: [
+                "Prune infected foliage.",
+                "Use drip irrigation.",
+                "Rotate crops regularly."
+            ],
+            treatments: [
+                "Apply chlorothalonil fungicide.",
+                "Use mancozeb spray.",
+                "Keep field clean."
+            ]
+        },
+
+        "Late Blight": {
+            precautions: [
+                "Destroy infected plants.",
+                "Reduce humidity levels.",
+                "Avoid wet leaves."
+            ],
+            treatments: [
+                "Use Ridomil Gold.",
+                "Apply systemic fungicide.",
+                "Monitor nearby crops."
+            ]
+        },
+
+        "Healthy": {
+            precautions: [
+                "Continue regular monitoring.",
+                "Maintain proper nutrition.",
+                "Use balanced irrigation."
+            ],
+            treatments: [
+                "Neem oil preventive spray.",
+                "Organic compost feeding."
+            ]
+        }
+    };
+
+    function previewImage(){
+
+        const file = document.getElementById('imageInput').files[0];
+
+        if(!file) return;
+
+        const reader = new FileReader();
+
+        reader.onload = function(e){
+
+            document.getElementById('previewImage').src = e.target.result;
+
+            document.getElementById('previewBox').style.display = "block";
         };
 
-        function processLocalFile() {
-            const selectedFile = fileField.files[0];
-            if (selectedFile) {
-                const streamReader = new FileReader();
-                streamReader.onload = function(e) {
-                    viewTarget.src = e.target.result;
-                    previewWrapper.style.display = 'block';
-                    triggerBtn.disabled = false;
-                    diagnosticReport.style.display = 'none';
+        reader.readAsDataURL(file);
+    }
+
+    async function analyzePlant(){
+
+        const file = document.getElementById('imageInput').files[0];
+
+        if(!file){
+            alert("Please upload an image.");
+            return;
+        }
+
+        document.getElementById('loader').style.display = "block";
+        document.getElementById('resultBox').style.display = "none";
+
+        const formData = new FormData();
+
+        // IMPORTANT
+        formData.append("plantImage", file);
+
+        try{
+
+            const response = await fetch(
+                `${BACKEND_URL}/api/diagnose`,
+                {
+                    method:"POST",
+                    body:formData
                 }
-                streamReader.readAsDataURL(selectedFile);
-            }
-        }
+            );
 
-        async function executeModelInference() {
-            const trackingFile = fileField.files[0];
-            if (!trackingFile) return;
+            const data = await response.json();
 
-            const binaryPack = new FormData();
-            binaryPack.append('plantImage', trackingFile);
+            console.log(data);
 
-            triggerBtn.style.display = 'none';
-            loadingSpinner.style.display = 'block';
-            diagnosticReport.style.display = 'none';
-
-            try {
-                const serverConnection = await fetch(`${BACKEND_URL}/api/diagnose`, {
-                    method: 'POST',
-                    body: binaryPack
-                });
-
-                if (!serverConnection.ok) {
-                    throw new Error('API Execution Disruption Fault');
-                }
-
-                const serverResponse = await serverConnection.json();
-                
-                const plant = serverResponse.plantName || "Tomato";
-                const condition = serverResponse.diseaseName || "Bacterial Spot";
-                
-                renderDynamicResults(plant, condition);
-
-            } catch (runtimeError) {
-                console.warn("Backend engine network latency hit. Deploying high-fidelity interface fallback metrics...", runtimeError);
-                renderDynamicResults("Tomato", "Bacterial Spot");
-                document.getElementById('out-condition').innerText += " (Inference Fallback Mode Active)";
-            } finally {
-                loadingSpinner.style.display = 'none';
-                triggerBtn.style.display = 'block';
-            }
-        }
-
-        function renderDynamicResults(plant, condition) {
-            // Update Core Diagnostic Cards
-            document.getElementById('out-plant').innerText = plant;
-            document.getElementById('out-condition').innerText = condition;
-            diagnosticReport.style.display = 'block';
-
-            // Match condition variations gracefully
-            let matchKey = "Healthy";
-            if (condition.includes("Spot") || condition.includes("Bacterial")) {
-                matchKey = "Bacterial Spot";
-            } else if (condition.includes("Early")) {
-                matchKey = "Early Blight";
-            } else if (condition.includes("Late") || condition.includes("Blight")) {
-                matchKey = "Late Blight";
+            if(!response.ok){
+                throw new Error(data.error || "Server error");
             }
 
-            const activeDataset = healthDatabaseDetails[matchKey];
+            const plant = data.plantName || "Unknown";
 
-            // Render matching specific agricultural precautions panels programmatically
-            let precautionsHTML = "";
-            activeDataset.precautions.forEach(item => {
-                precautionsHTML += `<div class="precaution-card">${item}</div>`;
-            });
-            precautionsContainer.innerHTML = precautionsHTML;
+            const disease = data.diseaseName || "Unknown";
 
-            // Render matching chemical treatment/pesticide panel options programmatically
-            let pesticidesHTML = "";
-            activeDataset.pesticides.forEach(item => {
-                pesticidesHTML += `<div class="pesticide-card">${item}</div>`;
-            });
-            pesticidesContainer.innerHTML = pesticidesHTML;
+            const confidence = data.confidence || 0;
+
+            document.getElementById('plantResult').innerText = plant;
+
+            document.getElementById('diseaseResult').innerText = disease;
+
+            document.getElementById('confidenceResult').innerText =
+            `${confidence}%`;
+
+            document.getElementById('resultBox').style.display = "block";
+
+            updateDiseaseInfo(disease);
+
+        }catch(error){
+
+            console.error(error);
+
+            alert("Failed to analyze image.");
+
+        }finally{
+
+            document.getElementById('loader').style.display = "none";
         }
-    </script>
+    }
+
+    function updateDiseaseInfo(disease){
+
+        let matchedKey = "Healthy";
+
+        if(
+            disease.includes("Bacterial") ||
+            disease.includes("Spot")
+        ){
+            matchedKey = "Bacterial Spot";
+        }
+
+        else if(
+            disease.includes("Early")
+        ){
+            matchedKey = "Early Blight";
+        }
+
+        else if(
+            disease.includes("Late") ||
+            disease.includes("Blight")
+        ){
+            matchedKey = "Late Blight";
+        }
+
+        const diseaseData = diseaseDatabase[matchedKey];
+
+        let html = "";
+
+        html += `
+        <div class="info-card">
+            <h4>⚠️ Precautions</h4>
+            <ul>
+                ${diseaseData.precautions.map(item =>
+                    `<li style="margin-bottom:8px;">${item}</li>`
+                ).join("")}
+            </ul>
+        </div>
+        `;
+
+        html += `
+        <div class="info-card">
+            <h4>🧪 Treatments</h4>
+            <ul>
+                ${diseaseData.treatments.map(item =>
+                    `<li style="margin-bottom:8px;">${item}</li>`
+                ).join("")}
+            </ul>
+        </div>
+        `;
+
+        document.getElementById('infoContainer').innerHTML = html;
+    }
+
+</script>
+
 </body>
 </html>
