@@ -1,7 +1,7 @@
 {
-  "name": "agroscan-premium-ui",
-  "version": "2.0.0",
-  "description": "Premium Dark Navy / Emerald Leaf Disease Diagnostic System Frontend",
+  "name": "plant-disease-frontend-premium-v5",
+  "version": "1.5.0",
+  "description": "Premium AgroScan Frontend with Automated Dynamic Precautions and Pesticides Recommendation Engine",
   "main": "index.html",
   "scripts": {
     "start": "echo 'Running production server...'"
