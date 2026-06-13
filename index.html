@@ -174,7 +174,6 @@
             font-weight:bold;
         }
 
-        /* NEW METRIC FEATURES STYLE EXTRA PACK */
         .health-score-container {
             margin-top: 15px;
             padding-top: 15px;
@@ -277,17 +276,12 @@
             <div class="result-box" id="resultBox">
 
                 <div class="result-row">
-                    <span class="label">Plant:</span>
-                    <span id="plantResult"></span>
-                </div>
-
-                <div class="result-row">
                     <span class="label">Disease:</span>
                     <span id="diseaseResult"></span>
                 </div>
 
                 <div class="result-row">
-                    <span class="label">Confidence:</span>
+                    <span class="label">Accuracy/Confidence:</span>
                     <span id="confidenceResult"></span>
                 </div>
 
@@ -431,11 +425,9 @@
                 throw new Error(data.error || "Server error");
             }
 
-            const plant = data.plantName || "Unknown";
             const disease = data.diseaseName || "Unknown";
             const confidence = data.confidence || 0;
 
-            document.getElementById('plantResult').innerText = plant;
             document.getElementById('diseaseResult').innerText = disease;
             document.getElementById('confidenceResult').innerText = `${confidence}%`;
 
